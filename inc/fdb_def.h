@@ -64,12 +64,12 @@ extern "C" {
 #define FDB_LOG_PREFIX2()              FDB_PRINT(" ")
 #define FDB_LOG_PREFIX()               FDB_LOG_PREFIX1();FDB_LOG_PREFIX2()
 #ifdef FDB_DEBUG_ENABLE
-#define FDB_DEBUG(...)                 FDB_LOG_PREFIX();FDB_PRINT("(%s:%d) ", __FILE__, __LINE__);FDB_PRINT(__VA_ARGS__)
+#define FDB_DEBUG(...)                 FDB_LOG_PREFIX();FDB_PRINT("(%s:%d) ", __FILE__, __LINE__);FDB_PRINT(__VA_ARGS__);FDB_PRINT("\r")
 #else
 #define FDB_DEBUG(...)
 #endif
 /* routine print function. Must be implement by user. */
-#define FDB_INFO(...)                  FDB_LOG_PREFIX();FDB_PRINT(__VA_ARGS__)
+#define FDB_INFO(...)                  FDB_LOG_PREFIX();FDB_PRINT(__VA_ARGS__);FDB_PRINT("\r")
 /* assert for developer. */
 #ifdef FDB_USING_NATIVE_ASSERT
 #define FDB_ASSERT(EXPR)               assert(EXPR);

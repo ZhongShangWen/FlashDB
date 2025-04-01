@@ -70,7 +70,7 @@ if (!(EXPR))                                                                   \
 #undef  log_d
 #endif
 #include <inttypes.h>
-#define log_d(...)                     FAL_PRINTF("[D/FAL] (%s:%" PRIdLEAST16 ") ", __func__, __LINE__);           FAL_PRINTF(__VA_ARGS__);FAL_PRINTF("\n")
+#define log_d(...)                     FAL_PRINTF("[D/FAL] (%s:%" PRIdLEAST16 ") ", __func__, __LINE__);           FAL_PRINTF(__VA_ARGS__);FAL_PRINTF("\r\n")
 
 #else
 
@@ -92,13 +92,13 @@ if (!(EXPR))                                                                   \
 #ifdef  log_e
 #undef  log_e
 #endif
-#define log_e(...)                     FAL_PRINTF("\033[31;22m[E/FAL] (%s:%d) ", __func__, __LINE__);FAL_PRINTF(__VA_ARGS__);FAL_PRINTF("\033[0m\n")
+#define log_e(...)                     FAL_PRINTF("\033[31;22m[E/FAL] (%s:%d) ", __func__, __LINE__);FAL_PRINTF(__VA_ARGS__);FAL_PRINTF("\033[0m\r\n")
 
 /* info level log */
 #ifdef  log_i
 #undef  log_i
 #endif
-#define log_i(...)                     FAL_PRINTF("\033[32;22m[I/FAL] ");                                FAL_PRINTF(__VA_ARGS__);FAL_PRINTF("\033[0m\n")
+#define log_i(...)                     FAL_PRINTF("\033[32;22m[I/FAL] ");                                FAL_PRINTF(__VA_ARGS__);FAL_PRINTF("\033[0m\r\n")
 
 /* FAL flash and partition device name max length */
 #ifndef FAL_DEV_NAME_MAX
