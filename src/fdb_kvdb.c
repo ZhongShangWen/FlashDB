@@ -65,9 +65,6 @@
 #define SECTOR_NOT_COMBINED                      0x00000000
 #define SECTOR_COMBINED                          0xFFFFFFFF
 #endif
-/* the next address is get failed */
-#define FAILED_ADDR                              0xFFFFFFFF
-
 #define KV_STATUS_TABLE_SIZE                     FDB_STATUS_TABLE_SIZE(FDB_KV_STATUS_NUM)
 
 #define SECTOR_NUM                               (db_max_size(db) / db_sec_size(db))
@@ -80,22 +77,6 @@
 #define KV_MAGIC_OFFSET                          ((unsigned long)(&((struct kv_hdr_data *)0)->magic))
 #define KV_LEN_OFFSET                            ((unsigned long)(&((struct kv_hdr_data *)0)->len))
 #define KV_NAME_LEN_OFFSET                       ((unsigned long)(&((struct kv_hdr_data *)0)->name_len))
-
-#define db_name(db)                              (((fdb_db_t)db)->name)
-#define db_init_ok(db)                           (((fdb_db_t)db)->init_ok)
-#define db_sec_size(db)                          (((fdb_db_t)db)->sec_size)
-#define db_max_size(db)                          (((fdb_db_t)db)->max_size)
-#define db_oldest_addr(db)                       (((fdb_db_t)db)->oldest_addr)
-
-#define db_lock(db)                                                            \
-    do {                                                                       \
-        if (((fdb_db_t)db)->lock) ((fdb_db_t)db)->lock((fdb_db_t)db);          \
-    } while(0);
-
-#define db_unlock(db)                                                          \
-    do {                                                                       \
-        if (((fdb_db_t)db)->unlock) ((fdb_db_t)db)->unlock((fdb_db_t)db);      \
-    } while(0);
 
 #define VER_NUM_KV_NAME                         "__ver_num__"
 

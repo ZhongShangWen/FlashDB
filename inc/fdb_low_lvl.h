@@ -52,6 +52,25 @@
 
 /* invalid address */
 #define FDB_FAILED_ADDR                      0xFFFFFFFF
+/* the next address is get failed */
+#define FAILED_ADDR                          FDB_FAILED_ADDR
+
+/* database field accessors */
+#define db_name(db)                          (((fdb_db_t)db)->name)
+#define db_init_ok(db)                       (((fdb_db_t)db)->init_ok)
+#define db_sec_size(db)                      (((fdb_db_t)db)->sec_size)
+#define db_max_size(db)                      (((fdb_db_t)db)->max_size)
+#define db_oldest_addr(db)                   (((fdb_db_t)db)->oldest_addr)
+
+#define db_lock(db)                                                            \
+    do {                                                                       \
+        if (((fdb_db_t)db)->lock) ((fdb_db_t)db)->lock((fdb_db_t)db);          \
+    } while(0);
+
+#define db_unlock(db)                                                          \
+    do {                                                                       \
+        if (((fdb_db_t)db)->unlock) ((fdb_db_t)db)->unlock((fdb_db_t)db);      \
+    } while(0);
 
 size_t _fdb_set_status(uint8_t status_table[], size_t status_num, size_t status_index);
 size_t _fdb_get_status(uint8_t status_table[], size_t status_num);
