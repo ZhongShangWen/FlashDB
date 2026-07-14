@@ -785,20 +785,26 @@ static fdb_err_t format_sector(fdb_kvdb_t db, uint32_t addr, uint32_t combined_v
 #else   // seperate the whole "sec_hdr" program to serval sinle program operation to prevent re-program issue on STM32L4xx or
         // other MCU internal flash
         /* write the sector store status */
-        _fdb_write_status((fdb_db_t)db,
+        result = _fdb_write_status((fdb_db_t)db,
                           addr + SECTOR_STORE_OFFSET,
                           sec_hdr.status_table.store,
                           FDB_SECTOR_STORE_STATUS_NUM,
                           FDB_SECTOR_STORE_EMPTY,
                           true);
+        if (result != FDB_NO_ERR) {
+            return result;
+        }
 
         /* write the sector dirty status */
-        _fdb_write_status((fdb_db_t)db,
+        result = _fdb_write_status((fdb_db_t)db,
                           addr + SECTOR_DIRTY_OFFSET,
                           sec_hdr.status_table.dirty,
                           FDB_SECTOR_DIRTY_STATUS_NUM,
                           FDB_SECTOR_DIRTY_FALSE,
                           true);
+        if (result != FDB_NO_ERR) {
+            return result;
+        }
 
         /* write the magic word and combined next sector number */
         sec_hdr.magic = SECTOR_MAGIC_WORD;
@@ -1009,7 +1015,10 @@ static fdb_err_t move_kv(fdb_kvdb_t db, fdb_kv_t kv)
 
     /* prepare to delete the current KV */
     if (kv->status == FDB_KV_WRITE) {
-        del_kv(db, NULL, kv, false);
+        result = del_kv(db, NULL, kv, false);
+        if (result != FDB_NO_ERR) {
+            return result;
+        }
     }
 
     if ((kv_addr = alloc_kv(db, &sector, kv->len)) != FAILED_ADDR) {
@@ -1033,9 +1042,15 @@ static fdb_err_t move_kv(fdb_kvdb_t db, fdb_kv_t kv)
         size_t len, size, kv_len = kv->len;
 
         /* update the new KV sector status first */
-        update_sec_status(db, &sector, kv->len, NULL);
+        result = update_sec_status(db, &sector, kv->len, NULL);
+        if (result != FDB_NO_ERR) {
+            return result;
+        }
 
-        _fdb_write_status((fdb_db_t)db, kv_addr, status_table, FDB_KV_STATUS_NUM, FDB_KV_PRE_WRITE, false);
+        result = _fdb_write_status((fdb_db_t)db, kv_addr, status_table, FDB_KV_STATUS_NUM, FDB_KV_PRE_WRITE, false);
+        if (result != FDB_NO_ERR) {
+            return result;
+        }
         kv_len -= KV_MAGIC_OFFSET;
         for (len = 0, size = 0; len < kv_len; len += size) {
             if (len + sizeof(buf) < kv_len) {
@@ -1043,10 +1058,19 @@ static fdb_err_t move_kv(fdb_kvdb_t db, fdb_kv_t kv)
             } else {
                 size = kv_len - len;
             }
-            _fdb_flash_read((fdb_db_t)db, kv->addr.start + KV_MAGIC_OFFSET + len, (uint32_t *) buf, FDB_WG_ALIGN(size));
+            result = _fdb_flash_read((fdb_db_t)db, kv->addr.start + KV_MAGIC_OFFSET + len, (uint32_t *) buf, FDB_WG_ALIGN(size));
+            if (result != FDB_NO_ERR) {
+                return result;
+            }
             result = _fdb_flash_write((fdb_db_t)db, kv_addr + KV_MAGIC_OFFSET + len, (uint32_t *) buf, size, true);
+            if (result != FDB_NO_ERR) {
+                return result;
+            }
         }
-        _fdb_write_status((fdb_db_t)db, kv_addr, status_table, FDB_KV_STATUS_NUM, FDB_KV_WRITE, true);
+        result = _fdb_write_status((fdb_db_t)db, kv_addr, status_table, FDB_KV_STATUS_NUM, FDB_KV_WRITE, true);
+        if (result != FDB_NO_ERR) {
+            return result;
+        }
 
 #ifdef FDB_KV_USING_CACHE
         update_sector_empty_addr_cache(db, FDB_ALIGN_DOWN(kv_addr, db_sec_size(db)),
@@ -1058,7 +1082,9 @@ static fdb_err_t move_kv(fdb_kvdb_t db, fdb_kv_t kv)
     FDB_DEBUG("Moved the KV (%.*s) from 0x%08" PRIX32 " to 0x%08" PRIX32 ".\n", kv->name_len, kv->name, kv->addr.start, kv_addr);
 
 __exit:
-    del_kv(db, NULL, kv, true);
+    if (result == FDB_NO_ERR) {
+        result = del_kv(db, NULL, kv, true);
+    }
 
     return result;
 }
