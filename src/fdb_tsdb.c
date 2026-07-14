@@ -46,25 +46,6 @@
 #define SECTOR_END1_IDX_OFFSET                   ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[1].index))
 #define SECTOR_END1_STATUS_OFFSET                ((unsigned long)(&((struct sector_hdr_data *)0)->end_info[1].status))
 
-/* the next address is get failed */
-#define FAILED_ADDR                              0xFFFFFFFF
-
-#define db_name(db)                              (((fdb_db_t)db)->name)
-#define db_init_ok(db)                           (((fdb_db_t)db)->init_ok)
-#define db_sec_size(db)                          (((fdb_db_t)db)->sec_size)
-#define db_max_size(db)                          (((fdb_db_t)db)->max_size)
-#define db_oldest_addr(db)                       (((fdb_db_t)db)->oldest_addr)
-
-#define db_lock(db)                                                            \
-    do {                                                                       \
-        if (((fdb_db_t)db)->lock) ((fdb_db_t)db)->lock((fdb_db_t)db);          \
-    } while(0);
-
-#define db_unlock(db)                                                          \
-    do {                                                                       \
-        if (((fdb_db_t)db)->unlock) ((fdb_db_t)db)->unlock((fdb_db_t)db);      \
-    } while(0);
-
 #define _FDB_WRITE_STATUS(db, addr, status_table, status_num, status_index, sync)    \
     do {                                                                       \
         result = _fdb_write_status((fdb_db_t)db, addr, status_table, status_num, status_index, sync);\
