@@ -394,6 +394,11 @@ static fdb_err_t read_kv(fdb_kvdb_t db, fdb_kv_t kv)
         FDB_INFO("Error: Read the KV (%.*s@0x%08" PRIX32 ") CRC32 check failed!\n", name_len, kv->name, kv->addr.start);
     } else {
         kv->crc_is_ok = true;
+        /* clamp the name length read from flash to guard against corrupted or
+         * malicious headers overflowing the fixed-size kv->name buffer */
+        if (kv_hdr.name_len > FDB_KV_NAME_MAX) {
+            kv_hdr.name_len = FDB_KV_NAME_MAX;
+        }
         /* the name is behind aligned KV header */
         kv_name_addr = kv->addr.start + KV_HDR_DATA_SIZE;
         _fdb_flash_read((fdb_db_t)db, kv_name_addr, (uint32_t *) kv->name, FDB_WG_ALIGN(kv_hdr.name_len));
